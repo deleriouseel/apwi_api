@@ -1,6 +1,14 @@
 from pydantic import BaseModel
 
-class Program(BaseModel): 
-    title: str  
+
+class ProgramBase(BaseModel):
+    airdate: str
+    title: str
     network: str
-    date: str
+
+    class Config:
+        orm_mode = True
+
+
+class Program(ProgramBase):
+    title: str
