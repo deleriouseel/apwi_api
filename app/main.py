@@ -1,13 +1,10 @@
 from fastapi import FastAPI, Response, status, HTTPException, Depends, Query
-from fastapi.params import Body
-from pydantic import BaseModel, Required  
-from typing import Union  
+from pydantic import Required  
+from typing import List, Union  
 from dateutil import parser
-import psycopg2
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, func
-from . import models, schemas 
-from .config import settings
+from . import models, schemas
 from .database import engine, get_db
 import datetime
 
@@ -29,18 +26,18 @@ def parsedate(dates):
 def read_root():
     return {"Hello": "World"}
 
-#get list of programs ordered by descending  date
+#get list of programs ordered by descending date
 @app.get("/v1/programs", status_code=status.HTTP_200_OK, summary="Get list of all programs")
 def get_programs(response: Response, db: Session= Depends(get_db)):
     """
     List all Apply Within programs. Returned in reverse chronological order from today's date.
     """
-
+    
     programs = db.query(models.APWI).filter(models.APWI.airdate <= today).order_by(desc(models.APWI.airdate)).all()
 
     if not programs:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database did not return any programs")
-    return {"programs" : programs}
+    return programs
 
 
 #get list of programs by title
@@ -49,14 +46,12 @@ def get_titles(search: str, response: Response, db: Session= Depends(get_db)):
     """
     List all Apply Within programs with search term in title.
     """
-    
-
 
     programs = db.query(models.APWI).filter(models.APWI.title.ilike('%'+ search +'%')).order_by(desc(models.APWI.airdate)).all()
-    
+    print(programs)
     if not programs:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database did not return any programs")
-    return {"programs" : programs}    
+    return programs  
 
 
 #get list of radio stations in each network
@@ -74,7 +69,7 @@ def get_network(network, response: Response, db: Session= Depends(get_db)):
 
     if not programs:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database did not return any programs")
-    return {"programs" : programs}
+    return programs
 
 #get list of programs on a network by date
 @app.get("/v1/{network}/{start_date}", summary="Get programs by network and date")
@@ -95,4 +90,4 @@ def get_network_dates (network: str,  response: Response, db: Session= Depends(g
     if not start_date:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Date not in correct format. Please use YYYY-MM-DD.")
 
-    return{"programs": programs}
+    return programs
