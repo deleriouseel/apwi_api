@@ -8,4 +8,5 @@ class APWI(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     airdate = Column(String, nullable=False)
     title = Column(String, nullable=False)
+    network = Column(String, nullable=False)
 
