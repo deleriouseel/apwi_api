@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from fastapi import HTTPException, Response, Depends, status, APIRouter, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
@@ -7,14 +7,15 @@ from ..database import get_db
 from .. import schemas, models
 
 router = APIRouter(
-	prefix="/v1"
+	prefix= "/v1",
+    tags= ['Apply Within Programs by Network']
 )
 
 today = datetime.date.today().isoformat()
 
 
 #get list of programs on one network
-@router.get("/{network}", summary="List programs on one network: CALVARY or ACN")
+@router.get("/{network}", summary="List programs on one network: CALVARY or ACN", response_model=List[schemas.ProgramBase])
 def get_network(network, response: Response, db: Session= Depends(get_db), search: Optional[str]=None, skip: int = 0, limit: int = 20):
     """
     List programs by network (CALVARY or ACN). Returned in reverse chronological order from today's date.
@@ -38,7 +39,7 @@ def get_network(network, response: Response, db: Session= Depends(get_db), searc
     return programs
 
 #get list of programs on a network by date
-@router.get("/{network}/{start_date}", summary="Get programs by network and date")
+@router.get("/{network}/{start_date}", summary="Get programs by network and date", response_model=List[schemas.ProgramBase])
 def get_network_dates (network: str,  response: Response, db: Session= Depends(get_db), start_date: str = Query(regex="^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"), end_date: Optional[str] = Query(default=None, regex="^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$")):
     """
     Get programs on a specific network (CALVARY or ACN) by date (YYYY-MM-DD).

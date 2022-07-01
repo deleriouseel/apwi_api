@@ -14,5 +14,5 @@ app.include_router(networks.router)
 #root 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return {"Hello World": "Jesus Loves You"}
 

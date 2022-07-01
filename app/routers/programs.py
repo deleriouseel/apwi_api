@@ -8,14 +8,15 @@ from ..database import get_db
 from .. import schemas, models
 
 router = APIRouter(
-    prefix="/v1"
+    prefix="/v1",
+    tags= ['Apply Within Programs']
 )
 
 today = datetime.date.today().isoformat()
 
 
 #get list of programs ordered by descending date
-@router.get("/programs", status_code=status.HTTP_200_OK, summary="Get list of all programs")
+@router.get("/programs", status_code=status.HTTP_200_OK, summary="Get list of all programs", response_model=List[schemas.ProgramBase])
 def get_programs(response: Response, db: Session= Depends(get_db), search: Optional[str] = Query(default=None), skip: int = 0, limit: int = 40):
     """
     List all Apply Within programs. Returned in reverse chronological order from today's date. 
