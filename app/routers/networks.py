@@ -26,7 +26,7 @@ def get_network(network, response: Response, db: Session= Depends(get_db), searc
 
     network = network.upper()
 
-    programs = db.query(models.APWI).filter(models.APWI.network == network).filter(models.APWI.airdate <= today).filter(models.APWI.title.ilike('%'+search+'%')).order_by(desc(models.APWI.airdate)).all()
+    programs = db.query(models.APWI).filter(models.APWI.network == network).filter(models.APWI.airdate <= today).order_by(desc(models.APWI.airdate)).all()
 
     if not programs:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database did not return any programs")

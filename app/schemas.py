@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
 
+
 class ProgramBase(BaseModel):
     airdate: str
     title: str
@@ -10,5 +11,5 @@ class ProgramBase(BaseModel):
         orm_mode = True
 
 
-class Program(ProgramBase):
-    title: str
+class Program(BaseModel):
+    pass
