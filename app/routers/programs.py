@@ -8,21 +8,21 @@ from ..database import get_db
 from .. import schemas, models
 
 router = APIRouter(
-	prefix="/v1/programs"
+    prefix="/v1"
 )
 
 today = datetime.date.today().isoformat()
 
 
 #get list of programs ordered by descending date
-@router.get("/", status_code=status.HTTP_200_OK, summary="Get list of all programs")
+@router.get("/programs", status_code=status.HTTP_200_OK, summary="Get list of all programs")
 def get_programs(response: Response, db: Session= Depends(get_db), search: Optional[str] = Query(default=None)):
     """
     List all Apply Within programs. Returned in reverse chronological order from today's date.
 
     Search all programs by titles using: /?search=
     """
-    
+    #sqlalchemy doesn't like ilike with None types so don't make it.
     if search is None:
         programs = db.query(models.APWI).filter(models.APWI.airdate <= today).order_by(desc(models.APWI.airdate)).all()
     else:

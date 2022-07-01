@@ -1,8 +1,7 @@
-from typing import Optional, List, Union
-from fastapi import HTTPException, FastAPI, Response, Depends, status, APIRouter, Query
+from typing import Optional
+from fastapi import HTTPException, Response, Depends, status, APIRouter, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import desc, func
-from pydantic import Required
+from sqlalchemy import desc
 import datetime
 from ..database import get_db
 from .. import schemas, models
@@ -19,12 +18,14 @@ today = datetime.date.today().isoformat()
 def get_network(network, response: Response, db: Session= Depends(get_db), search: Optional[str]=None):
     """
     List programs by network (CALVARY or ACN). Returned in reverse chronological order from today's date.
-    
+
     Search within network with network?search=
 
     For future programs use "Get programs by network and date" endpoint: /v1/{network}/{start_date}?end_date=
     """
     network = network.upper()
+
+    #sqlalchemy doesn't like ilike with  None types so don't make it.
     if search is None:
         programs = db.query(models.APWI).filter(models.APWI.network == network).filter(models.APWI.airdate <= today).order_by(desc(models.APWI.airdate)).all()
     else:
@@ -51,7 +52,7 @@ def get_network_dates (network: str,  response: Response, db: Session= Depends(g
     programs = db.query(models.APWI).filter(models.APWI.network == network).filter(models.APWI.airdate.between(start_date,end_date)).order_by(desc(models.APWI.airdate)).all()
 
     if not start_date:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Date not in correct format. Please use YYYY-MM-DD.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database did not return any programs")
 
     return programs
 
