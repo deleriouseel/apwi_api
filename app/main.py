@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from . import models, schemas
+from . import models
 from .database import engine
 from .routers import programs, networks
 
@@ -11,8 +11,7 @@ app = FastAPI()
 app.include_router(programs.router)
 app.include_router(networks.router)
 
-#root 
+
 @app.get("/")
 def read_root():
     return {"Hello World": "Jesus Loves You"}
-
