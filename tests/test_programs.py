@@ -15,16 +15,10 @@ def test_network_acn():
     res = client.get("/v1/acn")
     network = res.json()[0]
 
+    assert len(res.json()) == 20
     assert network.get('network')  == 'ACN'
     assert res.status_code == 200
 
-def test_network_calvary():
-
-    res = client.get("/v1/calvary")
-    network = res.json()[0]
-
-    assert network.get('network')  == 'CALVARY'
-    assert res.status_code == 200 
 
 def test_network_search():
 
@@ -35,12 +29,18 @@ def test_network_search():
     assert res.status_code == 200
 
 def test_network_date():
-    res = client.get("/v1/acn/2022-03-03")
+    res = client.get("/v1/calvary/2022-03-03")
     date = res.json()[0].get('airdate')
    
     assert "2022-03-03" in date
     assert res.status_code == 200
 
+def test_network_daterange():
+    res = client.get("/v1/calvary/2022-04-01?end_date=2022-04-05")
+    dates = len(res.json())
+
+    assert dates == 3
+    assert res.status_code == 200
 
 def test_program():
 
@@ -48,6 +48,7 @@ def test_program():
     airdate = res.json()[0] 
     today = datetime.date.today().isoformat()
     
+    assert len(res.json()) == 40
     assert airdate.get('airdate') == today
     assert res.status_code == 200
 
