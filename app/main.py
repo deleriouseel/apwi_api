@@ -14,8 +14,4 @@ app.include_router(networks.router)
 
 @app.get("/")
 def read_root():
-<<<<<<< Updated upstream
-    return {"Hello World": "Jesus Loves You"}
-=======
     return {"Hello World": "Jesus Loves You. See /docs for docs."}
->>>>>>> Stashed changes
