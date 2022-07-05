@@ -30,9 +30,9 @@ def get_network(network, response: Response, db: Session = Depends(get_db), sear
 
     # Sqlalchemy doesn't like ilike with  None types so don't make it.
     if search is None:
-        programs = db.query(models.APWI).filter(models.APWI.network == network).filter(models.APWI.airdate <= today).order_by(desc(models.APWI.airdate)).limit(limit).offset(skip).all()
+        programs = db.query(models.APWI).filter(models.APWI.network == network).filter(models.APWI.airdate <= datetime.date.today().isoformat()).order_by(desc(models.APWI.airdate)).limit(limit).offset(skip).all()
     else:
-        programs = db.query(models.APWI).filter(models.APWI.network == network).filter(models.APWI.airdate <= today).filter(models.APWI.title.ilike(f'%{search}%')).order_by(desc(models.APWI.airdate)).limit(limit).offset(skip).all()
+        programs = db.query(models.APWI).filter(models.APWI.network == network).filter(models.APWI.airdate <= datetime.date.today().isoformat()).filter(models.APWI.title.ilike(f'%{search}%')).order_by(desc(models.APWI.airdate)).limit(limit).offset(skip).all()
 
     if not programs:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database did not return any programs")
@@ -54,7 +54,9 @@ def get_network_dates(network: str,  response: Response, db: Session = Depends(g
      
     programs = db.query(models.APWI).filter(models.APWI.network == network).filter(models.APWI.airdate.between(start_date, end_date)).order_by(desc(models.APWI.airdate)).all()
 
-    if not start_date:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database did not return any programs")
+    # if not start_date:
+    #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database did not return any programs")
+    if not programs:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Database did not return any programs.")    
 
     return programs
