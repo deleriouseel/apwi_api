@@ -6,6 +6,7 @@ class ProgramBase(BaseModel):
     airdate: date
     title: str
     network: str
+    id: int
 
     class Config:
         orm_mode = True
