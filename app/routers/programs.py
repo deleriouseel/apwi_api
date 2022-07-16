@@ -28,7 +28,7 @@ def get_programs(response: Response, db: Session = Depends(get_db), search: Opti
     """
     # Sqlalchemy doesn't like ilike with None types so don't make it.
     if search is None:
-        programs = db.query(models.APWI).filter(models.APWI.airdate <= datetime.date.today().isoformat()).order_by(desc(models.APWI.airdate)).limit(limit).offset(skip).all()
+        programs = db.query(models.APWI).filter(models.APWI.airdate <= datetime.date.today().isoformat()).order_by(desc(models.APWI.airdate),(models.APWI.network)).limit(limit).offset(skip).all()
     else:   
         programs = db.query(models.APWI).filter(models.APWI.airdate <= datetime.date.today().isoformat()).filter(models.APWI.title.ilike(f'%{search}%')).limit(limit).offset(skip).all()
 
