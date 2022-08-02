@@ -6,6 +6,7 @@ class ProgramBase(BaseModel):
     airdate: date
     title: str
     network: str
+    filename: str
     id: int
 
     class Config:
