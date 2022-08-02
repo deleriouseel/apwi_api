@@ -17,6 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+#why is CORS not working now?
 
 app.include_router(programs.router)
 app.include_router(networks.router)
