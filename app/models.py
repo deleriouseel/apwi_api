@@ -9,3 +9,4 @@ class APWI(Base):
     airdate = Column(String, nullable=False)
     title = Column(String, nullable=False)
     network = Column(String, nullable=False)
+    filename = Column(String, nullable=True)
