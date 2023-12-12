@@ -17,12 +17,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+app.include_router(users.router)
+app.include_router(login.router)
 app.include_router(programs.router)
 app.include_router(networks.router)
 app.include_router(stations.router)
-app.include_router(users.router)
-app.include_router(login.router)
 
 
 @app.get("/")
