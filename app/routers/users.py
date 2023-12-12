@@ -5,9 +5,6 @@ from ..database import get_db
 
 router = APIRouter(prefix="/v1/users", tags=["Users"])
 
-# /users/
-# /users
-
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=schemas.UserOut)
 def create_user(
