@@ -65,6 +65,7 @@ def get_programs(
     "/programs",
     status_code=status.HTTP_201_CREATED,
     response_model=schemas.ProgramBase,
+    include_in_schema=False,
 )
 def create_program(
     program: schemas.ProgramCreate,
