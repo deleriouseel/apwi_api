@@ -72,6 +72,10 @@ def create_program(
     db: Session = Depends(get_db),
     current_user: int = Depends(oauth2.get_current_user),
 ):
+    """
+    Add a radio program to the database.
+
+    """
     new_program = models.APWI(owner_id=current_user.id, **program.dict())
     db.add(new_program)
     db.commit()
