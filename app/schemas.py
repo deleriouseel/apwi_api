@@ -30,7 +30,10 @@ class LocationBase(BaseModel):
     city: str
     state: str
     country: str
-    id: int
+    idLocation: int
+
+    class Config:
+        orm_mode = True
 
 
 class LocationCreate(LocationBase):
@@ -43,7 +46,7 @@ class AirtimeBase(BaseModel):
     time: time
     live: bool
     airdays: Optional[int]
-    id: int
+    idAirtime: int
 
 
 class AirtimeCreate(AirtimeBase):
