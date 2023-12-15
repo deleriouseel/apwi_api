@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from . import models
 from .database import engine
-from .routers import programs, networks, stations, users, login
+from .routers import programs, networks, stations, users, login, locations
 
 
 models.Base.metadata.create_all(bind=engine)
@@ -19,9 +19,10 @@ app.add_middleware(
 
 app.include_router(users.router)
 app.include_router(login.router)
+app.include_router(locations.router)
+app.include_router(stations.router)
 app.include_router(programs.router)
 app.include_router(networks.router)
-app.include_router(stations.router)
 
 
 @app.get("/")
