@@ -17,7 +17,7 @@ dnspython==2.2.1
 ecdsa==0.18.0
 email-validator==1.2.1
 exceptiongroup==1.1.1
-fastapi==0.103.1
+fastapi==0.109.1
 gitdb==4.0.10
 GitPython==3.1.41
 greenlet==1.1.2
