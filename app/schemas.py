@@ -16,7 +16,7 @@ class ProgramBase(BaseModel):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ProgramCreate(BaseModel):
@@ -33,7 +33,7 @@ class LocationBase(BaseModel):
     idLocation: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class LocationCreate(LocationBase):
@@ -101,4 +101,4 @@ class UserOut(BaseModel):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
