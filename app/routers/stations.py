@@ -1,10 +1,10 @@
 from typing import Optional, List
 from fastapi import HTTPException, Response, Depends, status, APIRouter, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import desc
 import datetime
 from ..database import get_db
-from .. import schemas, models
+from .. import schemas, models, oauth2
 
 router = APIRouter(prefix="/v1", tags=["Apply Within Radio Stations"])
 
@@ -15,7 +15,7 @@ today = datetime.date.today().isoformat()
     "/stations",
     status_code=status.HTTP_200_OK,
     summary="Get list of all radio stations",
-    response_model=List[schemas.ProgramBase],
+    response_model=List[schemas.StationBase],
 )
 async def get_stations(
     response: Response,
@@ -24,6 +24,8 @@ async def get_stations(
     skip: int = 0,
     limit: int = 50,
 ):
+
+
     """
     List all radio stations Apply Within airs on.
 
@@ -33,18 +35,18 @@ async def get_stations(
     if search is None:
         stations = (
             db.query(models.STATION)
-            .join(
-                models.LOCATION,
-                models.Location.idLocation == models.STATION.location,
-                isouter=True,
+            .options(
+                joinedload(models.STATION.locations),
+                joinedload(models.STATION.airtimes)
             )
+            .limit(limit)
+            .offset(skip)
             .all()
         )
     else:
         stations = (
             db.query(models.STATION)
-            .filter(models.STATION.airdate <= datetime.date.today().isoformat())
-            .filter(models.STATION.title.ilike(f"%{search}%"))
+            .filter(models.STATION.name.ilike(f"%{search}%"))
             .limit(limit)
             .offset(skip)
             .all()
@@ -61,14 +63,22 @@ async def get_stations(
 
 @router.post(
     "/stations",
-    status_code=status.HTTP_200_OK,
+    status_code=status.HTTP_201_CREATED,
     summary="Add a radio station",
-    response_model=List[schemas.ProgramBase],
+    response_model=schemas.StationBase,
     include_in_schema=False,
 )
-def post_stations(response: Response, db: Session = Depends(get_db)):
+def post_stations(
+    station: schemas.StationCreate,
+    db: Session = Depends(get_db),
+    current_user: int = Depends(oauth2.get_current_user),
+):
     """
     Add a radio station to the database
     """
-
-    return response
+    new_station = models.STATION(**station.model_dump())
+    db.add(new_station)
+    db.commit()
+    db.refresh(new_station)
+    
+    return new_station

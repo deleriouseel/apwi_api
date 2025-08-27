@@ -5,7 +5,7 @@ Controls how a response from the DB is returned
 
 from pydantic import BaseModel, EmailStr
 from datetime import date, time, datetime
-from typing import Optional
+from typing import Optional, List
 
 
 class ProgramBase(BaseModel):
@@ -44,8 +44,7 @@ class LocationCreate(LocationBase):
 
 class AirtimeBase(BaseModel):
     time: time
-    live: bool
-    airdays: Optional[int]
+    airdays: Optional[str]
     idAirtime: int
 
 
@@ -54,17 +53,25 @@ class AirtimeCreate(AirtimeBase):
 
 
 class StationBase(BaseModel):
-    network: str
-    url: str
-    image: str
-    name: str
-    id: int
+    idStation: int
+    network: Optional[str] = None
+    url: Optional[str] = None
+    image: Optional[str] = None
+    name: Optional[str] = None
+    frequency: Optional[str] = None
+    live: Optional[bool] = None
+    call_letters: Optional[str] = None
+    locations: List[LocationBase] = []
+    airtimes: List[AirtimeBase] = []
+
+    class Config:
+        from_attributes = True
 
 
-class StationCreate(StationBase):
+class StationCreate(BaseModel):
     network: str
-    url: str
-    image: str
+    url: Optional[str]
+    image: Optional[str]
     name: str
 
 

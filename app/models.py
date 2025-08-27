@@ -29,19 +29,17 @@ class STATION(Base):
     __tablename__ = "station"
 
     idStation = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
-    frequency = Column(String, nullable=False)
-    location = Column(
-        Integer, ForeignKey("location.idLocation", ondelete="CASCADE"), nullable=False
-    )
-    airtime = Column(
-        Integer, ForeignKey("airtime.idAirtime", ondelete="CASCADE"), nullable=False
-    )
-    live = Column(Boolean, nullable=False, server_default="0")
     network = Column(String, nullable=True)
     url = Column(String, nullable=True)
     image = Column(String, nullable=True)
     name = Column(String, nullable=True)
-    callLetters = Column(String, nullable=True)
+    frequency = Column(String, nullable=True, default=None)
+    # location = Column(Integer, ForeignKey("location.idLocation", ondelete="CASCADE"), nullable=True)
+    # airtime = Column(Integer, ForeignKey("airtime.idAirtime", ondelete="CASCADE"), nullable=True)
+    live = Column(Boolean, nullable=True, default=False)
+    callletters = Column(String, nullable=True)
+    locations = relationship("LOCATION", secondary="station_location", back_populates="stations")
+    airtimes = relationship("AIRTIME", secondary="station_airtime", back_populates="stations")
 
 
 class AIRTIME(Base):
@@ -50,6 +48,12 @@ class AIRTIME(Base):
     idAirtime = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     time = Column(Time, nullable=False)
     airdays = Column(String, nullable=False)  # weekdays, saturday, sunday
+    stations = relationship("STATION", secondary="station_airtime", back_populates="airtimes")
+
+class StationAirtime(Base):
+    __tablename__ = "station_airtime"
+    station_id = Column(Integer, ForeignKey("station.idStation"), primary_key=True)
+    airtime_id = Column(Integer, ForeignKey("airtime.idAirtime"), primary_key=True)
 
 
 class LOCATION(Base):
@@ -61,6 +65,12 @@ class LOCATION(Base):
     city = Column(String, nullable=False)
     state = Column(String, nullable=False)
     country = Column(String, nullable=False)
+    stations = relationship("STATION", secondary="station_location", back_populates="locations")
+
+class StationLocation(Base):
+    __tablename__ = "station_location"
+    station_id = Column(Integer, ForeignKey("station.idStation"), primary_key=True)
+    location_id = Column(Integer, ForeignKey("location.idLocation"), primary_key=True)
 
 
 class User(Base):
