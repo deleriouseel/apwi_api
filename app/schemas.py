@@ -3,7 +3,7 @@ Controls how a response from the DB is returned
 
 """
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from datetime import date, time, datetime
 from typing import Optional, List
 
@@ -47,6 +47,8 @@ class AirtimeBase(BaseModel):
     airdays: Optional[str]
     idAirtime: int
 
+    model_config = ConfigDict(from_attributes=True)
+
 
 class AirtimeCreate(AirtimeBase):
     pass
@@ -60,12 +62,13 @@ class StationBase(BaseModel):
     name: Optional[str] = None
     frequency: Optional[str] = None
     live: Optional[bool] = None
-    call_letters: Optional[str] = None
+    local: Optional[bool] = None
+    # DB column is "callletters"; expose it as "call_letters" in the API.
+    call_letters: Optional[str] = Field(default=None, validation_alias="callletters")
     locations: List[LocationBase] = []
     airtimes: List[AirtimeBase] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 class StationCreate(BaseModel):

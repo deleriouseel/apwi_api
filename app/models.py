@@ -37,6 +37,7 @@ class STATION(Base):
     # location = Column(Integer, ForeignKey("location.idLocation", ondelete="CASCADE"), nullable=True)
     # airtime = Column(Integer, ForeignKey("airtime.idAirtime", ondelete="CASCADE"), nullable=True)
     live = Column(Boolean, nullable=True, default=False)
+    local = Column(Boolean, nullable=True, default=False)
     callletters = Column(String, nullable=True)
     locations = relationship("LOCATION", secondary="station_location", back_populates="stations")
     airtimes = relationship("AIRTIME", secondary="station_airtime", back_populates="stations")
