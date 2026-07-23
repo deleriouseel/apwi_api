@@ -28,11 +28,13 @@ def create_access_token(data: dict):
 def verify_access_token(token: str, credentials_exception):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        id: str = payload.get("user_id")
+        id = payload.get("user_id")
         if id is None:
             raise credentials_exception
-        token_data = schemas.TokenData(id=str(id))
-    except JWTError:
+        # Reject a non-numeric user_id here rather than letting int() blow up
+        # with a 500 further down.
+        token_data = schemas.TokenData(id=str(int(id)))
+    except (JWTError, TypeError, ValueError):
         raise credentials_exception
 
     return token_data
@@ -50,5 +52,11 @@ def get_current_user(
     token = verify_access_token(token, credentials_exception)
 
     user = db.query(models.User).filter(models.User.id == int(token.id)).first()
+
+    # A validly-signed token whose user has since been deleted must not
+    # authenticate. Without this the routes receive current_user=None and
+    # still run.
+    if user is None:
+        raise credentials_exception
 
     return user

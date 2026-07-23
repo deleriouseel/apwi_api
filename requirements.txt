@@ -16,6 +16,7 @@ email-validator==2.3.0
 fastapi==0.116.1
 greenlet==3.2.4
 h11==0.16.0
+httpx==0.28.1
 idna==3.10
 iniconfig==2.1.0
 isort==6.0.1
@@ -30,8 +31,8 @@ pluggy==1.6.0
 psycopg2-binary==2.9.10
 pyasn1==0.6.1
 pycparser==2.22
-pydantic==2.11.7
 pydantic-settings==2.10.1
+pydantic==2.11.7
 pydantic_core==2.33.2
 Pygments==2.19.2
 pylint==3.3.8
@@ -49,8 +50,8 @@ sortedcontainers==2.4.0
 SQLAlchemy==2.0.43
 starlette==0.47.3
 tomlkit==0.13.3
-trio==0.30.0
 trio-websocket==0.12.2
+trio==0.30.0
 typing-inspection==0.4.1
 typing_extensions==4.14.1
 urllib3==2.5.0
