@@ -1,9 +1,14 @@
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from . import models
 from .config import settings
 from .database import engine
 from .routers import programs, networks, stations, users, login, locations
+
+STATIC_DIR = Path(__file__).parent / "static"
 
 
 models.Base.metadata.create_all(bind=engine)
@@ -46,3 +51,11 @@ def read_root():
     return {
         "Hello World": "Jesus Loves You. See /docs for docs. Or /redoc if that's how you roll."
     }
+
+
+@app.get("/admin", include_in_schema=False)
+def admin_page():
+    # Simple browser UI for managing the DB. Served from the same origin as the
+    # API so its logged-in fetch() calls don't hit CORS. Auth still happens
+    # server-side -- this page just holds the bearer token in memory.
+    return FileResponse(STATIC_DIR / "admin.html")

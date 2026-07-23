@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APWI Admin</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #fff; --line: #e2e5ea; --ink: #1c2530;
+    --muted: #6b7480; --accent: #2f6feb; --danger: #d13b3b; --ok: #1f9d55;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.45 -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  }
+  header {
+    background: var(--card); border-bottom: 1px solid var(--line);
+    padding: 12px 20px; display: flex; align-items: center; gap: 16px;
+    position: sticky; top: 0; z-index: 5;
+  }
+  header h1 { font-size: 17px; margin: 0; }
+  header .spacer { flex: 1; }
+  #whoami { color: var(--muted); font-size: 13px; }
+  main { max-width: 1000px; margin: 24px auto; padding: 0 16px; }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 20px; margin-bottom: 20px;
+  }
+  h2 { font-size: 15px; margin: 0 0 14px; }
+  label { display: block; font-size: 13px; color: var(--muted); margin: 8px 0 3px; }
+  input, select {
+    width: 100%; padding: 8px 10px; border: 1px solid var(--line);
+    border-radius: 7px; font: inherit; background: #fff;
+  }
+  input[type=checkbox] { width: auto; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .row > div { flex: 1; min-width: 140px; }
+  button {
+    font: inherit; padding: 8px 14px; border: 0; border-radius: 7px;
+    background: var(--accent); color: #fff; cursor: pointer;
+  }
+  button:hover { filter: brightness(1.05); }
+  button.ghost { background: #eef1f6; color: var(--ink); }
+  button.danger { background: var(--danger); }
+  button.sm { padding: 4px 10px; font-size: 13px; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 18px; }
+  .tabs button { background: #eef1f6; color: var(--ink); }
+  .tabs button.active { background: var(--accent); color: #fff; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .03em; }
+  .table-wrap { overflow-x: auto; }
+  .msg { padding: 10px 12px; border-radius: 7px; margin: 10px 0; font-size: 14px; display: none; }
+  .msg.err { background: #fdecec; color: var(--danger); display: block; }
+  .msg.ok { background: #e9f7ef; color: var(--ok); display: block; }
+  .hidden { display: none !important; }
+  .muted { color: var(--muted); }
+  .toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+  .toolbar input { max-width: 240px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>APWI Admin</h1>
+  <div class="spacer"></div>
+  <span id="whoami" class="hidden"></span>
+  <button id="logoutBtn" class="ghost sm hidden">Log out</button>
+</header>
+
+<main>
+  <!-- LOGIN -->
+  <div id="loginCard" class="card" style="max-width:380px;margin:40px auto;">
+    <h2>Log in</h2>
+    <div id="loginMsg" class="msg"></div>
+    <label>Email</label>
+    <input id="email" type="email" autocomplete="username" placeholder="you@example.com">
+    <label>Password</label>
+    <input id="password" type="password" autocomplete="current-password">
+    <div style="margin-top:16px;"><button id="loginBtn">Log in</button></div>
+  </div>
+
+  <!-- APP -->
+  <div id="app" class="hidden">
+    <div class="tabs">
+      <button data-tab="stations" class="active">Stations</button>
+      <button data-tab="programs">Programs</button>
+      <button data-tab="locations">Locations</button>
+    </div>
+    <div id="globalMsg" class="msg"></div>
+
+    <!-- STATIONS -->
+    <section data-panel="stations">
+      <div class="card">
+        <h2>Add station</h2>
+        <div class="row">
+          <div><label>Name</label><input id="st_name"></div>
+          <div><label>Network</label><input id="st_network"></div>
+          <div><label>Call letters</label><input id="st_call"></div>
+        </div>
+        <div class="row">
+          <div><label>Frequency</label><input id="st_freq" placeholder="96.5 FM"></div>
+          <div><label>URL</label><input id="st_url"></div>
+          <div><label>Image URL</label><input id="st_image"></div>
+        </div>
+        <div class="row" style="align-items:center;margin-top:6px;">
+          <div style="flex:0 0 auto;"><label>Live</label><input id="st_live" type="checkbox"></div>
+          <div style="flex:0 0 auto;"><label>Local</label><input id="st_local" type="checkbox"></div>
+          <div style="flex:1;"></div>
+          <div style="flex:0 0 auto;align-self:flex-end;"><button id="st_add">Add station</button></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="toolbar">
+          <h2 style="margin:0;">Stations</h2>
+          <div class="spacer" style="flex:1;"></div>
+          <input id="st_search" placeholder="search name…">
+          <button class="ghost sm" id="st_reload">Reload</button>
+        </div>
+        <div class="table-wrap"><table id="st_table"></table></div>
+      </div>
+    </section>
+
+    <!-- PROGRAMS -->
+    <section data-panel="programs" class="hidden">
+      <div class="card">
+        <h2>Add program</h2>
+        <div class="row">
+          <div><label>Air date</label><input id="pg_airdate" type="date"></div>
+          <div><label>Title</label><input id="pg_title"></div>
+          <div><label>Network</label><input id="pg_network" placeholder="ACN or CALVARY"></div>
+        </div>
+        <div class="row" style="align-items:flex-end;">
+          <div><label>Filename</label><input id="pg_filename"></div>
+          <div style="flex:0 0 auto;"><button id="pg_add">Add program</button></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="toolbar">
+          <h2 style="margin:0;">Programs</h2>
+          <div style="flex:1;"></div>
+          <input id="pg_search" placeholder="search title…">
+          <button class="ghost sm" id="pg_reload">Reload</button>
+        </div>
+        <div class="table-wrap"><table id="pg_table"></table></div>
+      </div>
+    </section>
+
+    <!-- LOCATIONS -->
+    <section data-panel="locations" class="hidden">
+      <div class="card">
+        <h2>Add location</h2>
+        <div class="row" style="align-items:flex-end;">
+          <div><label>City</label><input id="lo_city"></div>
+          <div><label>State</label><input id="lo_state" placeholder="US-WA"></div>
+          <div><label>Country</label><input id="lo_country" placeholder="US"></div>
+          <div style="flex:0 0 auto;"><button id="lo_add">Add location</button></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="toolbar">
+          <h2 style="margin:0;">Locations</h2>
+          <div style="flex:1;"></div>
+          <input id="lo_search" placeholder="search…">
+          <button class="ghost sm" id="lo_reload">Reload</button>
+        </div>
+        <div class="table-wrap"><table id="lo_table"></table></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+// ---- token lives in memory only; cleared on refresh/logout ----
+let TOKEN = null;
+let EMAIL = null;
+
+const $ = (id) => document.getElementById(id);
+
+async function api(method, path, body) {
+  const opts = { method, headers: {} };
+  if (TOKEN) opts.headers["Authorization"] = "Bearer " + TOKEN;
+  if (body !== undefined) {
+    opts.headers["Content-Type"] = "application/json";
+    opts.body = JSON.stringify(body);
+  }
+  const res = await fetch(path, opts);
+  if (res.status === 401) {
+    logout();
+    throw new Error("Session expired — please log in again.");
+  }
+  const text = await res.text();
+  let data = null;
+  try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+  if (!res.ok) {
+    const detail = data && data.detail ? data.detail : ("HTTP " + res.status);
+    throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
+  }
+  return data;
+}
+
+function flash(el, text, kind) {
+  el.textContent = text;
+  el.className = "msg " + (kind || "");
+  if (kind === "ok") setTimeout(() => { el.className = "msg"; el.textContent = ""; }, 3000);
+}
+function globalErr(e) { flash($("globalMsg"), e.message || String(e), "err"); }
+function globalOk(m) { flash($("globalMsg"), m, "ok"); }
+
+// ---- auth ----
+async function login() {
+  const email = $("email").value.trim();
+  const password = $("password").value;
+  if (!email || !password) { flash($("loginMsg"), "Enter email and password.", "err"); return; }
+  // /v1/login expects OAuth2 form fields, not JSON.
+  const form = new URLSearchParams({ username: email, password });
+  try {
+    const res = await fetch("/v1/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: form,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.detail || "Invalid credentials");
+    TOKEN = data.access_token;
+    EMAIL = email;
+    onLoggedIn();
+  } catch (e) {
+    flash($("loginMsg"), e.message || String(e), "err");
+  }
+}
+
+function logout() {
+  TOKEN = null; EMAIL = null;
+  $("app").classList.add("hidden");
+  $("loginCard").classList.remove("hidden");
+  $("whoami").classList.add("hidden");
+  $("logoutBtn").classList.add("hidden");
+  $("password").value = "";
+}
+
+function onLoggedIn() {
+  $("loginCard").classList.add("hidden");
+  $("app").classList.remove("hidden");
+  $("whoami").textContent = EMAIL;
+  $("whoami").classList.remove("hidden");
+  $("logoutBtn").classList.remove("hidden");
+  flash($("loginMsg"), "", "");
+  loadStations();
+}
+
+// ---- tabs ----
+document.querySelectorAll(".tabs button").forEach((btn) => {
+  btn.onclick = () => {
+    document.querySelectorAll(".tabs button").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    const tab = btn.dataset.tab;
+    document.querySelectorAll("[data-panel]").forEach((p) => {
+      p.classList.toggle("hidden", p.dataset.panel !== tab);
+    });
+    if (tab === "stations") loadStations();
+    if (tab === "programs") loadPrograms();
+    if (tab === "locations") loadLocations();
+  };
+});
+
+function td(text) { const c = document.createElement("td"); c.textContent = text ?? ""; return c; }
+function delCell(onClick) {
+  const c = document.createElement("td");
+  const b = document.createElement("button");
+  b.className = "danger sm"; b.textContent = "Delete"; b.onclick = onClick;
+  c.appendChild(b); return c;
+}
+function header(cols) {
+  const tr = document.createElement("tr");
+  cols.forEach((c) => { const th = document.createElement("th"); th.textContent = c; tr.appendChild(th); });
+  return tr;
+}
+
+// ---- STATIONS ----
+async function loadStations() {
+  const table = $("st_table"); table.innerHTML = "";
+  try {
+    const q = $("st_search").value.trim();
+    const rows = await api("GET", "/v1/stations?limit=200" + (q ? "&search=" + encodeURIComponent(q) : ""));
+    table.appendChild(header(["ID", "Name", "Network", "Call", "Freq", "Live", "Local", ""]));
+    rows.forEach((s) => {
+      const tr = document.createElement("tr");
+      tr.append(td(s.idStation), td(s.name), td(s.network), td(s.call_letters),
+                td(s.frequency), td(s.live ? "✓" : ""), td(s.local ? "✓" : ""));
+      tr.appendChild(delCell(() => delStation(s)));
+      table.appendChild(tr);
+    });
+    if (!rows.length) table.appendChild(header(["No stations found"]));
+  } catch (e) {
+    if ((e.message || "").includes("did not return")) { table.appendChild(header(["No stations found"])); }
+    else globalErr(e);
+  }
+}
+async function addStation() {
+  const body = {
+    name: $("st_name").value.trim(),
+    network: $("st_network").value.trim(),
+    call_letters: $("st_call").value.trim() || null,
+    frequency: $("st_freq").value.trim() || null,
+    url: $("st_url").value.trim() || null,
+    image: $("st_image").value.trim() || null,
+    live: $("st_live").checked,
+    local: $("st_local").checked,
+  };
+  if (!body.name || !body.network) { globalErr(new Error("Name and network are required.")); return; }
+  try {
+    await api("POST", "/v1/stations", body);
+    ["st_name","st_network","st_call","st_freq","st_url","st_image"].forEach((id) => $(id).value = "");
+    $("st_live").checked = false; $("st_local").checked = false;
+    globalOk("Station added.");
+    loadStations();
+  } catch (e) { globalErr(e); }
+}
+async function delStation(s) {
+  if (!confirm(`Delete station "${s.name || s.idStation}"? This cannot be undone.`)) return;
+  try { await api("DELETE", "/v1/stations/" + s.idStation); globalOk("Station deleted."); loadStations(); }
+  catch (e) { globalErr(e); }
+}
+
+// ---- PROGRAMS ----
+async function loadPrograms() {
+  const table = $("pg_table"); table.innerHTML = "";
+  try {
+    const q = $("pg_search").value.trim();
+    const rows = await api("GET", "/v1/programs?limit=100" + (q ? "&search=" + encodeURIComponent(q) : ""));
+    table.appendChild(header(["ID", "Air date", "Title", "Network", "Filename", ""]));
+    rows.forEach((p) => {
+      const tr = document.createElement("tr");
+      tr.append(td(p.id), td(p.airdate), td(p.title), td(p.network), td(p.filename));
+      tr.appendChild(delCell(() => delProgram(p)));
+      table.appendChild(tr);
+    });
+  } catch (e) {
+    if ((e.message || "").includes("did not return")) table.appendChild(header(["No programs found"]));
+    else globalErr(e);
+  }
+}
+async function addProgram() {
+  const body = {
+    airdate: $("pg_airdate").value,
+    title: $("pg_title").value.trim(),
+    network: $("pg_network").value.trim().toUpperCase(),
+    filename: $("pg_filename").value.trim(),
+  };
+  if (!body.airdate || !body.title || !body.network || !body.filename) {
+    globalErr(new Error("All program fields are required.")); return;
+  }
+  try {
+    await api("POST", "/v1/programs", body);
+    ["pg_airdate","pg_title","pg_network","pg_filename"].forEach((id) => $(id).value = "");
+    globalOk("Program added.");
+    loadPrograms();
+  } catch (e) { globalErr(e); }
+}
+async function delProgram(p) {
+  if (!confirm(`Delete program "${p.title || p.id}"?`)) return;
+  try { await api("DELETE", "/v1/programs/" + p.id); globalOk("Program deleted."); loadPrograms(); }
+  catch (e) { globalErr(e); }
+}
+
+// ---- LOCATIONS ----
+async function loadLocations() {
+  const table = $("lo_table"); table.innerHTML = "";
+  try {
+    const q = $("lo_search").value.trim();
+    const rows = await api("GET", "/v1/locations/" + (q ? "?search=" + encodeURIComponent(q) : ""));
+    table.appendChild(header(["ID", "City", "State", "Country", ""]));
+    rows.forEach((l) => {
+      const tr = document.createElement("tr");
+      tr.append(td(l.idLocation), td(l.city), td(l.state), td(l.country));
+      tr.appendChild(delCell(() => delLocation(l)));
+      table.appendChild(tr);
+    });
+  } catch (e) {
+    if ((e.message || "").includes("did not return")) table.appendChild(header(["No locations found"]));
+    else globalErr(e);
+  }
+}
+async function addLocation() {
+  const body = {
+    city: $("lo_city").value.trim(),
+    state: $("lo_state").value.trim(),
+    country: $("lo_country").value.trim(),
+  };
+  if (!body.city || !body.state || !body.country) { globalErr(new Error("All location fields are required.")); return; }
+  try {
+    await api("POST", "/v1/locations/", body);
+    ["lo_city","lo_state","lo_country"].forEach((id) => $(id).value = "");
+    globalOk("Location added.");
+    loadLocations();
+  } catch (e) { globalErr(e); }
+}
+async function delLocation(l) {
+  if (!confirm(`Delete location "${l.city}, ${l.state}"?`)) return;
+  try { await api("DELETE", "/v1/locations/" + l.idLocation); globalOk("Location deleted."); loadLocations(); }
+  catch (e) { globalErr(e); }
+}
+
+// ---- wire up ----
+$("loginBtn").onclick = login;
+$("password").addEventListener("keydown", (e) => { if (e.key === "Enter") login(); });
+$("logoutBtn").onclick = logout;
+$("st_add").onclick = addStation;
+$("st_reload").onclick = loadStations;
+$("st_search").addEventListener("keydown", (e) => { if (e.key === "Enter") loadStations(); });
+$("pg_add").onclick = addProgram;
+$("pg_reload").onclick = loadPrograms;
+$("pg_search").addEventListener("keydown", (e) => { if (e.key === "Enter") loadPrograms(); });
+$("lo_add").onclick = addLocation;
+$("lo_reload").onclick = loadLocations;
+$("lo_search").addEventListener("keydown", (e) => { if (e.key === "Enter") loadLocations(); });
+</script>
+</body>
+</html>
