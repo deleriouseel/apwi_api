@@ -36,7 +36,7 @@ class LocationBase(BaseModel):
         from_attributes = True
 
 
-class LocationCreate(LocationBase):
+class LocationCreate(BaseModel):
     city: str
     state: str
     country: str
@@ -73,9 +73,43 @@ class StationBase(BaseModel):
 
 class StationCreate(BaseModel):
     network: str
-    url: Optional[str]
-    image: Optional[str]
+    url: Optional[str] = None
+    image: Optional[str] = None
     name: str
+    frequency: Optional[str] = None
+    live: Optional[bool] = False
+    local: Optional[bool] = False
+    call_letters: Optional[str] = Field(default=None, serialization_alias="callletters")
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class StationUpdate(BaseModel):
+    """PATCH body -- every field optional; only what is sent gets changed."""
+
+    network: Optional[str] = None
+    url: Optional[str] = None
+    image: Optional[str] = None
+    name: Optional[str] = None
+    frequency: Optional[str] = None
+    live: Optional[bool] = None
+    local: Optional[bool] = None
+    call_letters: Optional[str] = None
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class ProgramUpdate(BaseModel):
+    airdate: Optional[date] = None
+    title: Optional[str] = None
+    network: Optional[str] = None
+    filename: Optional[str] = None
+
+
+class LocationUpdate(BaseModel):
+    city: Optional[str] = None
+    state: Optional[str] = None
+    country: Optional[str] = None
 
 
 class CallLettersBase(BaseModel):

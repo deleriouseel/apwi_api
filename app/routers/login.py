@@ -8,8 +8,8 @@ router = APIRouter(prefix="/v1", tags=["Login"])
 
 @router.post(
     "/login",
+    summary="Log in and get an access token",
     response_model=schemas.Token,
-    include_in_schema=False,
 )
 def login(
     user_credentials: OAuth2PasswordRequestForm = Depends(),
