@@ -1,0 +1,40 @@
+# Development / test-only dependencies.
+#
+# Install both files for local work:
+#     pip install -r requirements.txt -r requirements-dev.txt
+#
+# The Azure deploy workflow installs requirements.txt ONLY, so nothing listed
+# here ships to production. Keep it that way: anything imported by app/ belongs
+# in requirements.txt instead.
+
+-r requirements.txt
+
+# --- test runner ---
+pytest==8.4.1
+iniconfig==2.1.0
+packaging==25.0
+pluggy==1.6.0
+Pygments==2.19.2
+
+# --- linting / formatting (see .vscode/settings.json) ---
+pylint==3.3.8
+astroid==3.3.11
+dill==0.4.0
+isort==6.0.1
+mccabe==0.7.0
+platformdirs==4.4.0
+tomlkit==0.13.3
+
+# --- browser automation ---
+# Not currently imported by anything in tests/. Kept here so it stays out of
+# the production image; drop it entirely if no browser tests materialise.
+selenium==4.35.0
+attrs==25.3.0
+outcome==1.3.0.post0
+PySocks==1.7.1
+sortedcontainers==2.4.0
+trio-websocket==0.12.2
+trio==0.30.0
+urllib3==2.5.0
+websocket-client==1.8.0
+wsproto==1.2.0
